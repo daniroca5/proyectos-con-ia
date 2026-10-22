@@ -1,71 +1,66 @@
 # Proyectos con ayuda de IA
 
-Proyectos propios hechos con un **asistente de IA para programar** (Claude Code), en curso o terminados. Yo decido qué se construye, fijo las normas y **reviso y pruebo** cada cambio. La IA escribe buena parte del código y de los scripts. Aquí van descritos. El código de cada uno se irá publicando cuando esté limpio.
+Proyectos propios hechos con un asistente de IA para programar (Claude Code). Yo decido qué se hace, fijo las normas y reviso y pruebo cada cambio. La IA escribe buena parte del código.
 
 ## 1. Web de apuntes de ASIR
 
-**[daniroca5.gamer.gd](https://daniroca5.gamer.gd/)**. Mis apuntes del ciclo, en Markdown, se convierten en una **web estática** que se publica sola.
+**[daniroca5.gamer.gd](https://daniroca5.gamer.gd/)**. Escribo los apuntes en Markdown y un generador en Python los convierte en una web que se publica sola.
 
-- **Generador en Python**: lee el *vault* de apuntes (convención de nombres por asignatura, tema y tipo) y crea las páginas, el menú y el índice lateral.
-- **Inicio con panel**: clase en curso, horario, fechas de exámenes y entregas, **tablero de tareas** sacado de las casillas de los apuntes, y notas.
-- **Buscador** (Ctrl+K), **biblioteca de comandos** enlazada desde los bloques de código, resaltado de sintaxis, 5 temas de color y modo de accesibilidad.
-- **Sincronización** de lo marcado entre dispositivos con una pequeña API en PHP.
-- **Publicación automática**:
-  - el código va a GitHub y una **GitHub Action** lo sube por FTP al alojamiento;
-  - las fechas de exámenes pasan a **Google Calendar** con avisos en el móvil;
-  - las entregas salen en **PDF** desde el mismo Markdown.
+<p align="center"><img src="img/web-inicio.jpg" width="49%" alt="Inicio"> <img src="img/web-documento.jpg" width="49%" alt="Documento"></p>
+
+### Cómo se usa
+- **Crear una página**: escribo un `.md` con el nombre de su asignatura, tema y tipo (por ejemplo `SRI[1](2)__DNS__[T].md`). Al publicar, sale como página nueva en el menú de esa asignatura.
+- **Publicar**: un solo comando hace todo el ciclo:
+  1. baja los últimos cambios;
+  2. genera la web y valida que no haya enlaces rotos ni errores;
+  3. hace el commit y lo sube a GitHub;
+  4. una GitHub Action la despliega por FTP.
+- **Notas especiales en el texto**: `[(fechas)]`, `[(tarea)]`, `[(material)]`… Con ellas la web rellena sola el inicio: fechas de exámenes y entregas, tareas pendientes y notas.
+
+### Qué tiene
+- **Inicio**: la clase en curso y la siguiente, el horario, las fechas (en lista o calendario) y un **tablero de tareas** sacado de las casillas de los apuntes.
+- **Índice lateral (TOC)** en cada documento. Va fijo al hacer scroll, tiene los niveles H1-H4 y botones para ir a la última sesión o a un marcador.
+- **Página de comandos**: una biblioteca con todos los comandos que salen en los apuntes, por programa y sistema. Cada bloque de código enlaza a ella.
+- **Buscador** (Ctrl+K) y atajos de teclado.
+- **Código**:
+  - resaltado de sintaxis;
+  - botón de copiar;
+  - definiciones de las siglas al pasar el ratón.
+- **Tests interactivos** para repasar.
+- **Visor de capturas** con zoom.
+- **5 temas de color** y un modo de accesibilidad.
+- **Sincronización** de lo que marco (tareas hechas, marcadores) entre el móvil y los PC, con una pequeña API en PHP.
+
+### Integraciones
+- **Moodle (API de servicios web)**: un script se conecta al aula virtual del centro con un token y hace tres cosas:
+  - ve si hay material nuevo y lo descarga a la carpeta de cada asignatura;
+  - lee las fechas de entrega;
+  - registra el material en la web, en la pestaña *Material*.
+- **Google Calendar**: los exámenes y entregas pasan al calendario con avisos en el móvil.
+- **PDF**: las prácticas se entregan en PDF generado desde el mismo Markdown, con índice y metadatos.
 
 ```mermaid
 flowchart LR
-    A[Apuntes en Markdown] --> B[Generador en Python]
-    B --> C[Web estática]
-    B --> D[PDF de entregas]
-    C --> E[GitHub] --> F[GitHub Actions: FTP] --> G[Alojamiento web]
-    B --> H[Fechas] --> I[Google Calendar]
+    M[Moodle API] --> A[Apuntes en Markdown]
+    A --> G[Generador Python]
+    G --> W[Web] --> GH[GitHub Actions] --> H[Hosting]
+    G --> P[PDF de entregas]
+    G --> C[Google Calendar]
 ```
 
-<p align="center">
-<img src="img/web-inicio.jpg" width="49%" alt="Inicio de la web de apuntes">
-<img src="img/web-documento.jpg" width="49%" alt="Un documento de apuntes">
-</p>
+<p align="center"><img src="img/web-comandos.jpg" width="70%" alt="Página de comandos"></p>
 
 ## 2. La tele con IA
-
-Control de la **Android TV** de casa desde el PC por **ADB**, en la red local:
-- averiguar **por qué capítulo voy** de una serie leyendo la pantalla de la app;
-- dejar listo el siguiente para reproducirlo cuando yo diga;
-- abrir películas de mi colección con un reproductor de vídeo.
-
-Es un ejercicio de automatización sobre un dispositivo «cerrado»: entradas de teclado, capturas de pantalla y lectura de la interfaz.
+Control de la Android TV de casa desde el PC por ADB: saber por qué capítulo voy de una serie y dejar listo el siguiente.
 
 ## 3. Ordenar el PC
-
-Proyecto por tandas para poner orden en años de archivos:
-- **indexar** los discos;
-- proponer **movimientos y renombrados** con una convención fija (vídeos, imágenes, música, documentos…);
-- detectar **duplicados verificados por contenido**, nunca solo por nombre;
-- generar **informes y buscadores en HTML**.
-
-Nada se borra sin revisarlo conmigo: el 95 % es mover y renombrar.
+Indexar los discos, renombrar con una convención fija, detectar duplicados verificados por contenido y generar informes en HTML.
 
 ## 4. Scripts de descarga y catalogación
-
-Scripts que **recopilan el contenido que tengo guardado en distintas plataformas** y lo descargan a local con sus datos (título, fecha, origen, etiquetas). Así queda organizado por categorías y se puede consultar en local. Trabajo con APIs y exportaciones, reintentos, registro de lo ya descargado y ejecución en segundo plano con progreso visible.
+Scripts que recopilan el contenido que tengo guardado en distintas plataformas y lo organizan en local por categorías.
 
 ## 5. Otros
-
-- **Mensajería entre mis PCs**: una pequeña aplicación de escritorio en C# que manda avisos y órdenes entre ordenadores por una **red privada (Tailscale)**, con tarjetas en pantalla.
-- **Material de clase**: descarga del material del aula virtual a carpetas por asignatura y paso de las fechas de entrega al calendario.
-
-<p align="center"><img src="img/web-comandos.jpg" width="640" alt="Biblioteca de comandos de la web"></p>
-
-## Cómo trabajo con IA
-
-- **Normas escritas**: convenciones de nombres, de formato y de seguridad guardadas como instrucciones que la IA sigue en cada sesión.
-- **Todo en Git**: cada cambio queda en un commit con su mensaje, y lo que no funciona se revierte.
-- **Verificar antes de dar algo por hecho**: capturas, pruebas en el navegador o en el móvil y validación automática antes de publicar.
-- **Privacidad**: lo personal se queda en local y nunca va a un repositorio público.
+- **Mensajería entre mis PC**: una pequeña aplicación en C# que manda avisos por una red privada (Tailscale).
 
 ---
-
-Daniel Roca Martínez · [Currículum](https://daniroca5.gamer.gd/cv/) · [LinkedIn](https://www.linkedin.com/in/daniel-r-m-02b369164/)
+Daniel Roca Martínez · [Currículum](https://daniroca5.gamer.gd/cv/)
