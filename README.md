@@ -89,9 +89,45 @@ Nada se borra sin revisarlo conmigo: el 95 % es mover y renombrar.
 
 Scripts que recopilan el contenido que tengo guardado en distintas plataformas y lo **descargan a local con sus datos** (título, fecha, origen, etiquetas), organizado por categorías. Tienen **reintentos**, un **registro de lo ya descargado** para no repetir, ejecución en segundo plano y una ventana con el progreso.
 
-## 5. Mensajería entre mis PC
+## 5. Notinsajes: mensajería entre mis PC
 
-Una pequeña aplicación de escritorio en **C#** que manda avisos y órdenes entre mis ordenadores por una **red privada (Tailscale)**. Muestra tarjetas en pantalla y tiene un instalador propio.
+**Notinsajes** es una aplicación de escritorio para Windows, hecha en **C#**, que manda mensajes de texto cortos de un ordenador mío a otro. El mensaje aparece como una **tarjeta** abajo a la derecha de la pantalla, junto al reloj, y se puede contestar desde ella. La uso entre mi PC de sobremesa, mi portátil (Surface) y el portátil de un familiar.
+
+<p align="center"><img src="img/notinsajes-tarjeta.jpg" width="49%" alt="Una tarjeta de Notinsajes sobre la barra de tareas"> <img src="img/notinsajes-menu.jpg" width="49%" alt="El menú del clic derecho: Contestar, Borrar, Borrar todos y Estilo"></p>
+
+### Cómo funciona
+
+1. **Enviar**: el mensaje se guarda como un pequeño `.json` (`{v, de, texto, fecha}`) en una cola y se manda con **Taildrop**, la función de Tailscale para pasar archivos entre equipos de la misma cuenta. Si el otro PC está apagado, el mensaje espera en la cola y se **reintenta cada 30 s** en un hilo aparte.
+2. **Recibir**: un servicio sin ventana, con un icono en la bandeja, mira cada 2 s la carpeta donde Taildrop deja los archivos. Solo acepta `tsmsg_*` y `tsack_*` de **equipos conocidos**, con el remitente coincidiendo con el nombre del archivo, de **menos de 64 KB** y con JSON válido. Lo demás se descarta.
+3. **Acuse de recibo**: al llegar un mensaje, el receptor devuelve un acuse. Así, desde un solo PC compruebo que el otro lo ha recibido y lo está enseñando, y que los dos sentidos funcionan.
+4. **Contestar**: un clic en la tarjeta abre un cuadro de texto; Enter envía y Mayús+Enter salta de línea. La respuesta va a quien escribió el mensaje y quita la tarjeta original.
+
+### Por qué es seguro
+
+- **Lo recibido nunca se ejecuta**: solo se lee como JSON y se enseña como texto.
+- **Sin servidor y sin puertos abiertos**: los mensajes viajan **cifrados punto a punto** por Tailscale (WireGuard), sin pasar por ningún servidor de terceros.
+- **Solo equipos de mi cuenta**: Taildrop no acepta archivos de otras cuentas, y además el programa descarta lo que no venga de un equipo de su tabla.
+- **Sin administrador**: todo se instala en el perfil del usuario (`HKCU`, `%LOCALAPPDATA%`), sin tocar el sistema.
+- **Las órdenes solo se aceptan en local**: desde fuera solo llegan mensajes, acuses y peticiones de borrar tarjetas del mismo equipo.
+
+### Qué hace
+
+- **Tarjetas** con 5 temas de color (los mismos que la web) y un estilo alternativo que imita la notificación de Windows. Se apilan si llegan muchas.
+- **Cuadro de órdenes**: al escribir `/` salen sugerencias como en PowerShell (↑ ↓ para elegir, Tab o → para completar). Por ejemplo `/con` cambia el destino, `/estado` enseña la cola y el último acuse, `/tema` cambia el aspecto, `/retirar` borra lo que envié y `/demo` manda mensajes de prueba para ver cómo se apilan.
+- **Atajos de teclado**: un gesto de **tres teclas** en el que el orden decide la acción (contestar, borrar todas, retirar lo enviado), con un gancho de teclado de bajo nivel que solo mira esas teclas. Hay otro atajo del sistema de reserva para cuando delante hay una ventana de administrador.
+- **Consola**: `--enviar`, `--estado` y `--orden` permiten usarlo desde scripts. Mi asistente de IA lo usa así para avisarme entre equipos.
+- **Instalador propio**: el mismo `.exe` abre un asistente con estética de consola (negro, monoespaciado y con poco texto) que comprueba Tailscale, detecta el equipo, pregunta cómo arrancar (al iniciar sesión, con Tailscale o a mano), instala, deja la guía y se puede **actualizar, reparar o desinstalar**. Aparece en «Aplicaciones instaladas» de Windows.
+
+<p align="center"><img src="img/notinsajes-asistente-1.jpg" width="32%" alt="Asistente: bienvenida"> <img src="img/notinsajes-asistente-opciones.jpg" width="32%" alt="Asistente: opciones de arranque"> <img src="img/notinsajes-asistente-listo.jpg" width="32%" alt="Asistente: instalación terminada"></p>
+
+### Cómo está hecho
+
+- **C# 5** compilado con el `csc.exe` que ya trae Windows, **sin dependencias** y en un solo `.exe` (la guía en PDF va dentro).
+- Interfaz con **Windows Forms** dibujada a mano: tarjetas con borde y acrílico, lista de sugerencias que no roba el foco del cuadro y menú propio.
+- **Gancho de teclado** (`WH_KEYBOARD_LL`) que descarta las teclas inyectadas, y un `RegisterHotKey` de reserva.
+- Un **mutex** impide dos copias a la vez, y abrirlo otra vez avisa a la que está en marcha.
+- La **identidad del remitente** la comprueba Tailscale, sin criptografía propia.
+- Un modo **escucha** opcional hace que un chat de Claude Code reciba los mensajes como instrucciones y conteste con mensajes cortos.
 
 ## Cómo trabajo con IA
 
