@@ -91,7 +91,7 @@ Scripts que recopilan el contenido que tengo guardado en distintas plataformas y
 
 ## 5. Notinsajes: mensajería entre mis PC
 
-**Notinsajes** es una aplicación de escritorio para Windows, hecha en **C#**, que manda mensajes de texto cortos de un ordenador mío a otro. El mensaje aparece como una **tarjeta** abajo a la derecha de la pantalla, junto al reloj, y se puede contestar desde ella. La uso entre mi PC de sobremesa, mi portátil (Surface) y el portátil de un familiar.
+**Notinsajes** es una aplicación de escritorio para Windows, hecha en **C#**, que manda mensajes de texto cortos de un ordenador mío a otro. El mensaje aparece como una **tarjeta** abajo a la derecha de la pantalla, junto al reloj, y se puede contestar desde ella. La uso entre mi PC de sobremesa, mi portátil (Surface) y un tercer portátil.
 
 <p align="center"><img src="img/notinsajes-tarjeta.jpg" width="49%" alt="Una tarjeta de Notinsajes sobre la barra de tareas"> <img src="img/notinsajes-menu.jpg" width="49%" alt="El menú del clic derecho: Contestar, Borrar, Borrar todos y Estilo"></p>
 
